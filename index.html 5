@@ -1,0 +1,148 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta 
+charset="UTF-8"> <meta name="viewport" 
+content="width=device-width, initial-scale=1"> 
+<title>EarnNova247 Admin</title> <style>
+:root {
+  --bg:#0b0b0e; --panel:#15151b; --orange:#ff7900; 
+  --text:#f5f5f7; --muted:#a1a1aa; --border:#292930;
+}
+* { box-sizing:border-box; } body { margin:0; 
+  background:var(--bg); color:var(--text); 
+  font-family:Arial,sans-serif;
+}
+header { padding:22px 18px; border-bottom:1px solid 
+  var(--border); display:flex; align-items:center; 
+  gap:12px;
+}
+.logo { background:var(--orange); color:white; 
+  padding:12px; border-radius:12px; font-weight:bold;
+}
+header h2 { margin:0; font-size:19px; } header p { 
+margin:5px 0 0; font-size:11px; color:var(--muted); } main 
+{ max-width:900px; margin:auto; padding:20px 15px 45px; } 
+h3 { font-size:17px; margin:25px 0 14px; } .stats { 
+display:grid; grid-template-columns:1fr 1fr; gap:12px; } 
+.card,.section {
+  background:var(--panel); border:1px solid var(--border); 
+  border-radius:15px; padding:17px; margin-bottom:14px;
+}
+.label { color:var(--muted); font-size:12px; } .value { 
+font-size:25px; font-weight:bold; margin-top:12px; } 
+.orange { color:var(--orange); } input,button {
+  width:100%; padding:13px; border-radius:9px; 
+  font-size:14px; margin-top:10px;
+}
+input { background:#0e0e12; border:1px solid #33333b; 
+  color:white; outline:none;
+}
+button { background:var(--orange); color:white; 
+  font-weight:bold; border:0; cursor:pointer;
+}
+button.secondary { background:#292930; } button:active { 
+opacity:.8; } .notice {
+  font-size:12px; color:var(--muted); line-height:1.6;
+}
+.ad-item { padding:13px 0; border-bottom:1px solid 
+  var(--border); overflow-wrap:anywhere;
+}
+.ad-item:last-child { border-bottom:0; } footer { 
+text-align:center; color:var(--muted); font-size:11px; 
+padding:20px; } @media(min-width:600px) {
+  main { padding-top:30px; } .stats { 
+  grid-template-columns:repeat(3,1fr); }
+}
+</style> </head> <body> <header> <div class="logo">EN</div> 
+  <div>
+    <h2>EarnNova247</h2> <p>ADMIN CONTROL PANEL</p> </div> 
+</header> <main>
+  <h3>Dashboard</h3> <div class="stats"> <div class="card"> 
+      <div class="label">Total Users</div> <div 
+      class="value" id="users">—</div>
+    </div> <div class="card"> <div class="label">Total 
+      Ads</div> <div class="value" id="ads">0</div>
+    </div> <div class="card"> <div class="label">Reward Per 
+      Ad</div> <div class="value orange">৳0.10</div>
+    </div> </div> <h3>Add Advertisement</h3> <section 
+  class="section">
+    <label class="label" for="adname">Advertisement 
+    name</label> <input id="adname" placeholder="e.g. 
+    Advertisement 1"> <label class="label" 
+    for="adurl">Direct advertisement URL</label> <input 
+    id="adurl" type="url" 
+    placeholder="https://example.com"> <button 
+    id="addBtn">Add Advertisement</button> <p 
+    class="notice">
+      Demo only: advertisements are saved in this browser. 
+      This does not yet publish ads to Telegram or award 
+      money.
+    </p> </section> <h3>Advertisement List</h3> <section 
+  class="section" id="adlist">
+    <p class="notice">No advertisements added yet.</p> 
+  </section> <h3>System Status</h3> <section 
+  class="section">
+    <p class="notice"> Telegram bot connection: Not 
+      connected<br> Shared database: Not connected<br> Cash 
+      rewards: Disabled until verification is configured
+    </p> </section> </main> <footer>EarnNova247 · Admin 
+Dashboard</footer> <script> const nameInput = 
+document.getElementById('adname'); const urlInput = 
+document.getElementById('adurl'); const list = 
+document.getElementById('adlist'); const storageKey = 
+'earnnova_demo_ads'; function loadAds() {
+  try { const ads = 
+    JSON.parse(localStorage.getItem(storageKey) || '[]'); 
+    document.getElementById('ads').textContent = 
+    ads.length; list.innerHTML = ''; if (!ads.length) {
+      list.innerHTML = '<p class="notice">No advertisements 
+      added yet.</p>'; return;
+    }
+    ads.forEach((ad, i) => { const item = 
+      document.createElement('div');
+      item.className = 'ad-item';
+      const title = document.createElement('strong');
+      title.textContent = ad.name;
+      const link = document.createElement('p');
+      link.className = 'notice';
+      link.textContent = ad.url;
+      const del = document.createElement('button');
+      del.className = 'secondary';
+      del.textContent = 'Delete';
+      del.onclick = () => {
+        const current = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        current.splice(i, 1);
+        localStorage.setItem(storageKey, JSON.stringify(current));
+        loadAds();
+      };
+      item.append(title, link, del);
+      list.append(item);
+    });
+  } catch {
+    list.textContent = 'Could not load demo advertisements.';
+  }
+}
+
+document.getElementById('addBtn').addEventListener('click', () => {
+  const name = nameInput.value.trim();
+  const url = urlInput.value.trim();
+  let parsed;
+  try { parsed = new URL(url); } catch {}
+  if (!name || !parsed || !['http:', 'https:'].includes(parsed.protocol)) {
+    alert('Enter an advertisement name and a valid http/https URL.');
+    return;
+  }
+  const ads = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  ads.push({name, url});
+  localStorage.setItem(storageKey, JSON.stringify(ads));
+  nameInput.value = '';
+  urlInput.value = '';
+  loadAds();
+  alert('Saved in this browser demo only.');
+});
+
+loadAds();
+</script>
+</body>
+</html>
+0
+cd ~/earnnova-admin
+
